@@ -5,17 +5,18 @@ import { StyleSheet, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { RootNavigator } from '@/app/navigation/RootNavigator';
 import { EmptyState } from '@/components/EmptyState';
 import { Loader } from '@/components/Loader';
-import { ComponentGallery } from '@/dev/ComponentGallery';
 import { useAppFonts } from '@/theme/fonts';
 import { theme } from '@/theme/theme';
 
 /**
  * Root providers (SONA_TECHNICAL_PLAN.md §3).
  *
- * Phase 0/1 renders the component gallery. Phase 2 replaces the gallery with
- * `RootNavigator` (onboarding stack vs. app shell, auth-gated) — see §6.1.
+ * `RootNavigator` gates onboarding vs. the app shell (§6.1). The Phase 1
+ * component gallery still lives at `@/dev/ComponentGallery` — swap it in here
+ * temporarily to eyeball components against the reference screens.
  */
 export default function App() {
   const [fontsLoaded, fontError] = useAppFonts();
@@ -58,7 +59,7 @@ function AppContent({ fontsLoaded, fontError }: { fontsLoaded: boolean; fontErro
     return <Loader fullscreen />;
   }
 
-  return <ComponentGallery />;
+  return <RootNavigator />;
 }
 
 const styles = StyleSheet.create({

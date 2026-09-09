@@ -24,6 +24,18 @@ export type ShopCategory = keyof typeof SHOP_PRICE_SOL;
 /** Receives mint + shop fees. */
 export const TREASURY_WALLET = env.solana.treasuryWallet;
 
+/**
+ * How Sona introduces itself to a wallet during MWA authorization (§6.2).
+ *
+ * `uri`/`icon` are intentionally omitted: wallets resolve `icon` relative to
+ * `uri`, and pointing at a domain we do not own would be worse than showing no
+ * icon at all. Fill both in once the catalog hostname exists (decision log #5) —
+ * `icon` must then be a path relative to `uri`.
+ */
+export const APP_IDENTITY: { name: string; uri?: string; icon?: string } = {
+  name: 'Sona',
+};
+
 /** On-chain NFT symbol, written into token metadata and matched during restore (§6.8). */
 export const SONA_NFT_SYMBOL = 'SONA';
 

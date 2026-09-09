@@ -2,11 +2,10 @@
   "//": "Composite indexes required by SONA_TECHNICAL_PLAN.md §4. Firestore auto-indexes single fields; only these multi-field queries need declaring.",
   "indexes": [
     {
-      "//": "Discover feed (Phase 4): verified humans matching an interest, newest first.",
+      "//": "Discover feed (Phase 4): users matching an interest, newest first. The `verifiedHuman` leg was dropped with the Genesis check (decision log #1). Phase 4 decides how 'has a minted Sona' is filtered — a range on primaryCharacterId cannot be combined with array-contains, so it needs either an equality field or a client-side pass.",
       "collectionGroup": "users",
       "queryScope": "COLLECTION",
       "fields": [
-        { "fieldPath": "verifiedHuman", "order": "ASCENDING" },
         { "fieldPath": "interests", "arrayConfig": "CONTAINS" },
         { "fieldPath": "updatedAt", "order": "DESCENDING" }
       ]

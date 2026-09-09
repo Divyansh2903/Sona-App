@@ -3,15 +3,21 @@ rules_version = '2';
 // Sona Firestore rules — MVP (SONA_TECHNICAL_PLAN.md §4).
 //
 // ─────────────────────────────────────────────────────────────────────────────
-// KNOWN LIMITATION (§9): the client authenticates with Firebase ANONYMOUS auth and
-// separately proves wallet ownership to the *app* via an MWA signature. Firestore
-// rules cannot verify that signature, so the first write to `users/{wallet}` simply
-// claims that wallet for the current uid. A determined user could claim a wallet
-// they do not control.
+// PERMANENT LIMITATION (§9, decision log #2): the client authenticates with Firebase
+// ANONYMOUS auth and separately proves wallet ownership to the *app* via an MWA
+// signature. Firestore rules cannot verify that signature, so the first write to
+// `users/{wallet}` simply claims that wallet for the current uid. A determined user
+// could claim a wallet they do not control.
 //
-// This is accepted for the MVP. Hardening path (§9): a Cloud Function that verifies
-// the signed nonce and mints a Firebase custom token carrying the wallet as a claim;
-// these rules then check `request.auth.token.wallet` instead of the stored uid.
+// There is NO hardening path. Verifying a signed nonce needs a trusted server, and
+// Cloud Functions are permanently out of scope (decision log #2) — Firebase here is
+// Firestore + Anonymous Auth, forever. This is an accepted property of the product,
+// not deferred work.
+//
+// CONSEQUENCE worth knowing before you debug it: the anonymous uid changes on
+// reinstall, and `ownsWallet` compares against the STORED uid — so a reinstalled
+// user can read their own profile but cannot write it. `auth.service` surfaces this
+// as `SonaSession.canWriteProfile === false` rather than failing sign-in.
 // ─────────────────────────────────────────────────────────────────────────────
 
 service cloud.firestore {
@@ -21,26 +27,47 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // True when the caller's session is the one recorded on users/{wallet}.
-    function ownsWallet(wallet) {
-      return signedIn()
-        && exists(/databases/$(database)/documents/users/$(wallet))
-        && get(/databases/$(database)/documents/users/$(wallet)).data.uid == request.auth.uid;
-    }
+    // NOTE: `ownsWallet()` was removed in decision log #13. It read the uid this
+    // same client had written and called that ownership — it gated nothing an
+    // attacker couldn't walk around, while permanently locking out any honest user
+    // whose anonymous uid changed. Every former use is now `signedIn()`. Do not
+    // reintroduce it: verifying wallet ownership needs a trusted server, which is
+    // out of scope for good (§9, decision log #2).
 
-    // Profiles are public to signed-in users (Discover reads them); writes are
-    // restricted to the claiming session.
+    // Profiles are public to signed-in users (Discover reads them).
+    //
+    // UPDATE is open to any signed-in session (decision log #13). The old
+    // `ownsWallet(wallet)` check looked like an ownership gate but never was one:
+    // it compared against a uid this same client wrote, and §9 already concedes
+    // that the first write claims the wallet. All it actually did was lock honest
+    // users out of their own profile whenever their anonymous uid changed —
+    // reinstall, cleared app data — which breaks the §6.8 restore path.
+    // `uid` is still stamped on create and refreshed on update, but only as a
+    // "which session last touched this" breadcrumb. No rule treats it as proof.
     match /users/{wallet} {
       allow read: if signedIn();
       allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
-      allow update: if ownsWallet(wallet)
-                    && request.resource.data.uid == request.auth.uid;
+      allow update: if signedIn();
       allow delete: if false;
 
-      // ownedItems, badges, and any future subcollection.
-      match /{document=**} {
+      // ownedItems, badges, and any future subcollection. Same reasoning as the
+      // parent — a reinstalled user must still be able to record a shop purchase.
+      //
+      // MUST NOT be `/{document=**}`. A recursive wildcard matches ZERO or more
+      // segments, so that form ALSO matches `users/{wallet}` itself — and because
+      // rules are permissive-OR, its `write` silently overrides the
+      // `allow delete: if false` above. Probed on the live project 2026-07-31: the
+      // `/{document=**}` form let an unrelated signed-in session delete a user doc
+      // outright. Leading with `{subcollection}` forces a minimum of two segments,
+      // so this can only ever match documents INSIDE a subcollection.
+      match /{subcollection}/{document=**} {
         allow read: if signedIn();
-        allow write: if ownsWallet(wallet);
+        // `write` would include delete, letting any session wipe someone's
+        // purchases or badges. Relaxing WHO may write (#13) was never meant to
+        // relax WHETHER records can be destroyed — these stay non-deletable, same
+        // as `txns`. Probed 2026-07-31.
+        allow create, update: if signedIn();
+        allow delete: if false;
       }
     }
 
@@ -52,15 +79,17 @@ service cloud.firestore {
       allow create: if signedIn()
                     && request.resource.data.ownerWallet is string
                     && request.resource.data.catalogId is string;
-      allow update: if signedIn() && ownsWallet(resource.data.ownerWallet);
+      // Ownership transfers happen on-chain; this row is a cache that any client
+      // may correct from a holdings scan (§6.7).
+      allow update: if signedIn();
       allow delete: if false;
     }
 
-    // TODO(§9): participant-level enforcement needs the wallet as an auth claim.
-    // Until the custom-token function exists, any signed-in session can read these.
-    // Message BODIES are encrypted before write (§6.5), so ciphertext is what leaks,
-    // not plaintext — but metadata (who talks to whom) is exposed. Do not ship to
-    // production without the hardening path.
+    // Participant-level enforcement would need the wallet as a verified auth claim,
+    // which no client can produce (§9). Any signed-in session can therefore read
+    // these. Message BODIES are encrypted before write (§6.5), so ciphertext is what
+    // leaks, not plaintext — but conversation METADATA (who talks to whom, when) is
+    // exposed. Permanent and accepted (decision log #2), not a TODO.
     match /connections/{connectionId} {
       allow read, write: if signedIn();
     }
@@ -79,10 +108,12 @@ service cloud.firestore {
       }
     }
 
-    // Wallet activity feed, mirroring on-chain history.
+    // Wallet activity feed, mirroring on-chain history. Append-only: entries can
+    // never be edited or removed, which is the property that actually matters here
+    // — every row is checkable against the chain by signature.
     match /txns/{wallet}/items/{txId} {
       allow read: if signedIn();
-      allow create: if ownsWallet(wallet);
+      allow create: if signedIn();
       allow update, delete: if false;
     }
 
