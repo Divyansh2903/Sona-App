@@ -6,6 +6,9 @@ Verified-by-mint slow-social app for the Solana Seeker. Android only, Expo SDK 5
 
 ## Read before doing anything
 
+- **`../CONTEXT.md`** (root) — project-wide context, hackathon constraints, and the
+  community (not dating) positioning (§13 #14). Read it first. `../PROGRESS_TRACKER.md` is the
+  committed done/remaining list; keep it current.
 - **`../SONA_TECHNICAL_PLAN.md` is the single source of truth.** Architecture, data model,
   design system, phase order. Follow it exactly.
 - **§13 (decision log) overrides anything above it in that document.** When they conflict,
