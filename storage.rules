@@ -1,0 +1,26 @@
+rules_version = '2';
+
+// Sona Cloud Storage rules — MVP.
+//
+// Storage hosts the character catalog (SONA_TECHNICAL_PLAN.md §6.6):
+//   catalog/{catalogId}/image.png
+//   catalog/{catalogId}/metadata.json
+//
+// The catalog is authored ONCE offline and uploaded by hand. Nothing in the app
+// ever writes to Storage, so every path is read-only to clients.
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // The metadata.json URI is embedded in on-chain NFT metadata and must be
+    // publicly readable — wallets and explorers fetch it unauthenticated.
+    match /catalog/{catalogId}/{file} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

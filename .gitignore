@@ -13,10 +13,15 @@ expo-env.d.ts
 .kotlin/
 *.orig.*
 *.jks
+*.keystore
 *.p8
 *.p12
 *.key
 *.mobileprovision
+
+# Firebase CLI (rules/indexes ARE committed; caches and debug logs are not)
+.firebase/
+*-debug.log
 
 # Metro
 .metro-health-check*
@@ -31,10 +36,23 @@ yarn-error.*
 *.pem
 
 # local env files
-.env*.local
+# NOTE: `.env.*` is deliberately broad — Expo also reads .env.local,
+# .env.development, .env.production, and every one of those holds the same
+# bundled-but-not-secret values (§7). .env.example is the only one committed.
+.env
+.env.*
+!.env.example
 
-# typescript
+# local working log (see CLAUDE.md) — not a deliverable
+progress.md
+
+# typescript / lint caches
 *.tsbuildinfo
+.eslintcache
+
+# editors
+.idea/
+*.swp
 
 # generated native folders
 /ios

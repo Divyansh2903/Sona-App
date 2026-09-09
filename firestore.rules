@@ -1,0 +1,100 @@
+rules_version = '2';
+
+// Sona Firestore rules — MVP (SONA_TECHNICAL_PLAN.md §4).
+//
+// ─────────────────────────────────────────────────────────────────────────────
+// KNOWN LIMITATION (§9): the client authenticates with Firebase ANONYMOUS auth and
+// separately proves wallet ownership to the *app* via an MWA signature. Firestore
+// rules cannot verify that signature, so the first write to `users/{wallet}` simply
+// claims that wallet for the current uid. A determined user could claim a wallet
+// they do not control.
+//
+// This is accepted for the MVP. Hardening path (§9): a Cloud Function that verifies
+// the signed nonce and mints a Firebase custom token carrying the wallet as a claim;
+// these rules then check `request.auth.token.wallet` instead of the stored uid.
+// ─────────────────────────────────────────────────────────────────────────────
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    // True when the caller's session is the one recorded on users/{wallet}.
+    function ownsWallet(wallet) {
+      return signedIn()
+        && exists(/databases/$(database)/documents/users/$(wallet))
+        && get(/databases/$(database)/documents/users/$(wallet)).data.uid == request.auth.uid;
+    }
+
+    // Profiles are public to signed-in users (Discover reads them); writes are
+    // restricted to the claiming session.
+    match /users/{wallet} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.uid == request.auth.uid;
+      allow update: if ownsWallet(wallet)
+                    && request.resource.data.uid == request.auth.uid;
+      allow delete: if false;
+
+      // ownedItems, badges, and any future subcollection.
+      match /{document=**} {
+        allow read: if signedIn();
+        allow write: if ownsWallet(wallet);
+      }
+    }
+
+    // Index/cache of on-chain ownership. The CHAIN is the source of truth (§6.7) —
+    // this collection can be rebuilt from a holdings scan at any time, so the rules
+    // here are deliberately permissive rather than authoritative.
+    match /characters/{mintAddress} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+                    && request.resource.data.ownerWallet is string
+                    && request.resource.data.catalogId is string;
+      allow update: if signedIn() && ownsWallet(resource.data.ownerWallet);
+      allow delete: if false;
+    }
+
+    // TODO(§9): participant-level enforcement needs the wallet as an auth claim.
+    // Until the custom-token function exists, any signed-in session can read these.
+    // Message BODIES are encrypted before write (§6.5), so ciphertext is what leaks,
+    // not plaintext — but metadata (who talks to whom) is exposed. Do not ship to
+    // production without the hardening path.
+    match /connections/{connectionId} {
+      allow read, write: if signedIn();
+    }
+
+    match /threads/{threadId} {
+      allow read, write: if signedIn();
+
+      match /messages/{messageId} {
+        // Enforce the §6.5 invariant at the database layer: a message body must be
+        // an encrypted { ciphertext, nonce } pair. Plaintext writes are rejected.
+        allow read: if signedIn();
+        allow create: if signedIn()
+                      && request.resource.data.body.ciphertext is string
+                      && request.resource.data.body.nonce is string;
+        allow update, delete: if false;
+      }
+    }
+
+    // Wallet activity feed, mirroring on-chain history.
+    match /txns/{wallet}/items/{txId} {
+      allow read: if signedIn();
+      allow create: if ownsWallet(wallet);
+      allow update, delete: if false;
+    }
+
+    // Report/block documents (Phase 7). Write-only from clients.
+    match /reports/{reportId} {
+      allow create: if signedIn();
+      allow read, update, delete: if false;
+    }
+
+    // Anything not matched above is denied.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

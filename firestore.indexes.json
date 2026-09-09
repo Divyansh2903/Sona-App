@@ -1,0 +1,35 @@
+{
+  "//": "Composite indexes required by SONA_TECHNICAL_PLAN.md §4. Firestore auto-indexes single fields; only these multi-field queries need declaring.",
+  "indexes": [
+    {
+      "//": "Discover feed (Phase 4): verified humans matching an interest, newest first.",
+      "collectionGroup": "users",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "verifiedHuman", "order": "ASCENDING" },
+        { "fieldPath": "interests", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "//": "Thread list (Phase 5): the current user's threads, most recent first.",
+      "collectionGroup": "threads",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "participants", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "//": "Connections for a wallet, filtered by status (excludes passed users from Discover).",
+      "collectionGroup": "connections",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "participants", "arrayConfig": "CONTAINS" },
+        { "fieldPath": "status", "order": "ASCENDING" },
+        { "fieldPath": "updatedAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}
