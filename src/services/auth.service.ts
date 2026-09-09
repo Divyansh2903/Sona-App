@@ -10,29 +10,23 @@ import { WalletError, type WalletSession } from '@/services/wallet.service';
 import { parseUserDoc, buildNewUserPayload, USERS_COLLECTION, type UserDoc } from '@/models/user';
 
 /**
- * Sign-in (SONA_TECHNICAL_PLAN.md §6.2).
+ * Wallet authorize → sign a nonce → anonymous Firebase session → upsert the user.
  *
- * The flow is: authorize the wallet over MWA → have it sign a random nonce
- * (liveness) → open a Firebase **anonymous** session → upsert `users/{wallet}`.
- * There is no Google, email or password path anywhere in Sona (§6.2 #4).
- *
- * What the nonce signature does and does not buy us: there is no server to
- * verify it against (decision log #2), so the check is local. It proves the
- * wallet app can actually sign for the address it just handed us — which stops
- * an accidental mismatch — but it is NOT an ownership proof to Firestore. Per
- * §9 the first write to `users/{wallet}` claims that wallet, permanently.
+ * The nonce signature is verified locally because no server exists to verify it
+ * against. It proves the wallet can sign for the address it just handed us; it is
+ * not an ownership proof, and the first write to `users/{wallet}` claims that
+ * wallet permanently.
  */
 
 const NONCE_BYTES = 32;
 
 export interface SonaSession {
   wallet: WalletSession;
-  /** Anonymous Firebase uid backing this session. */
   uid: string;
   user: UserDoc;
 }
 
-/** Full sign-in: wallet approval required. */
+/** Prompts the wallet for approval. */
 export async function signIn(): Promise<SonaSession> {
   const { session, challenge, signature } = await walletService.connectAndProve(buildChallenge);
 
@@ -49,13 +43,8 @@ export async function signIn(): Promise<SonaSession> {
   return buildSession(session, uid);
 }
 
-/**
- * Restores a previous session on launch without touching the wallet.
- *
- * See the session-model note in `wallet.service` — re-associating with the
- * wallet on every cold start would foreground the wallet app, so the cached
- * authorization is trusted until a signature is actually needed.
- */
+/** Restores on launch without touching the wallet — see the session model note in
+ * `wallet.service`. */
 export async function restore(): Promise<SonaSession | null> {
   const session = await walletService.loadSession();
   if (session === null) return null;
@@ -65,23 +54,16 @@ export async function restore(): Promise<SonaSession | null> {
 }
 
 /**
- * Drops the wallet authorization — and deliberately KEEPS the anonymous Firebase
- * session alive.
+ * Drops the wallet authorization and deliberately keeps the Firebase session.
  *
- * Signing out of an anonymous account destroys its uid permanently: there is no
- * credential to sign back in with. Because the rules grant writes on
- * `users/{wallet}` to the uid that claimed it (§9), calling `firebaseSignOut`
- * here would permanently brick write access to the user's own profile the first
- * time they tapped Sign out. Verified on device, 2026-07-31.
- *
- * The anonymous uid is a *device* identity, not a user identity. The wallet is
- * the user identity, and that is what actually gets signed out.
+ * Signing out of an anonymous account destroys its uid permanently — there is no
+ * credential to sign back in with — so doing it here would strand every document
+ * that uid created. The uid is a device identity; the wallet is the user identity,
+ * and the wallet is what gets signed out.
  */
 export async function signOut(): Promise<void> {
   await walletService.disconnect();
 }
-
-// ─── Internals ───────────────────────────────────────────────────────────────
 
 async function buildSession(wallet: WalletSession, uid: string): Promise<SonaSession> {
   const user = await upsertUser(wallet.walletAddress, uid);
@@ -89,9 +71,8 @@ async function buildSession(wallet: WalletSession, uid: string): Promise<SonaSes
 }
 
 /**
- * The message the wallet is asked to sign. Human-readable on purpose — wallets
- * show these bytes to the user, and an opaque blob is exactly what a phishing
- * prompt looks like.
+ * Human-readable on purpose: wallets display these bytes to the user, and an
+ * opaque blob is what a phishing prompt looks like.
  */
 function buildChallenge(walletAddress: string): Uint8Array {
   const nonce = Buffer.from(getRandomBytes(NONCE_BYTES)).toString('hex');
@@ -120,10 +101,9 @@ function verifyChallenge(
   }
 }
 
-/** Reuses the persisted anonymous session when there is one; otherwise creates it. */
 async function ensureAnonymousUid(): Promise<string> {
-  // Auth persistence (AsyncStorage) resolves asynchronously — without this the
-  // first launch check would race and mint a second uid.
+  // Auth persistence resolves asynchronously; without this the check below races
+  // and mints a second uid on every cold start.
   await auth.authStateReady();
 
   const existing = auth.currentUser;
@@ -133,14 +113,7 @@ async function ensureAnonymousUid(): Promise<string> {
   return credential.user.uid;
 }
 
-/**
- * Creates or refreshes `users/{walletAddress}` (§4).
- *
- * Any signed-in session may update the doc (decision log #13), so a uid change —
- * reinstall, cleared app data — no longer locks the user out of their own
- * profile. `uid` is refreshed here only as a breadcrumb for whoever is debugging
- * later; nothing reads it as proof of anything (§9).
- */
+/** `uid` is stored as a debugging breadcrumb; no rule and no caller treats it as proof. */
 async function upsertUser(walletAddress: string, uid: string): Promise<UserDoc> {
   const ref = doc(db, USERS_COLLECTION, walletAddress);
   const snapshot = await getDoc(ref);

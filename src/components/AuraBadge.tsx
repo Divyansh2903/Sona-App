@@ -16,7 +16,7 @@ export interface AuraBadgeProps {
 }
 
 /**
- * AuraBadge (SONA_TECHNICAL_PLAN.md §5.2) — "Lvl N Aura" pill with an on-chain
+ * "Lvl N Aura" pill with an on-chain
  * micro-label. Aura is the on-chain reputation tied to the user's Seeker ID.
  */
 export function AuraBadge({

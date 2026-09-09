@@ -25,7 +25,7 @@ import { MINT_FEE_SOL, SHOP_PRICE_SOL, TIP_PRESETS_SOL } from '@/config/constant
 import { theme } from '@/theme/theme';
 
 /**
- * Dev-only gallery for eyeballing every §5.2 component against the
+ * Dev-only gallery for eyeballing every shared component against the
  * `sona_app_ui/<screen>/screen.png` references. Phase 1 acceptance surface.
  *
  * Not shipped in the app shell — Phase 2 swaps this out for `RootNavigator`.

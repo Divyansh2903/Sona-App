@@ -7,7 +7,7 @@ import { GlassPanel } from '@/components/GlassPanel';
 import { Text } from '@/components/Text';
 import { theme } from '@/theme/theme';
 
-/** The three top-level destinations (SONA_TECHNICAL_PLAN.md §6.1). */
+/** The three top-level destinations. */
 export type TabKey = 'discover' | 'threads' | 'you';
 
 interface TabDef {
@@ -28,12 +28,11 @@ export interface FloatingTabBarProps {
 }
 
 /**
- * FloatingTabBar (SONA_TECHNICAL_PLAN.md §5.2, §6.1).
- * A glass pill docked 24px from the bottom. Active tab gets a 4px gradient dot
+ * A glass pill docked 24px from the bottom; the active tab gets a gradient dot
  * beneath its icon.
  *
- * Per the "Semantic Shell Mandate" (§6.1) this bar is HIDDEN on onboarding, mint,
- * chat, and modal flows — the navigator decides, not this component.
+ * Hidden on onboarding, mint, chat, and modal flows — the navigator decides that,
+ * not this component.
  */
 export function FloatingTabBar({ activeTab, onTabPress }: FloatingTabBarProps) {
   const insets = useSafeAreaInsets();
@@ -67,7 +66,7 @@ export function FloatingTabBar({ activeTab, onTabPress }: FloatingTabBarProps) {
                 >
                   {tab.label}
                 </Text>
-                {/* Active marker is a shape, not just a color shift (plan §3). */}
+                {/* A shape, not just a color shift. */}
                 <View style={styles.dotSlot}>
                   {active && (
                     <LinearGradient

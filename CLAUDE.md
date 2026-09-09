@@ -10,8 +10,10 @@ Verified-by-mint slow-social app for the Solana Seeker. Android only, Expo SDK 5
   design system, phase order. Follow it exactly.
 - **§13 (decision log) overrides anything above it in that document.** When they conflict,
   §13 wins. Do not "fix" code to match an earlier section that §13 has superseded.
-- **`progress.md`** (gitignored, repo root) — current phase, what's verified, what's next.
+- **`docs/progress.md`** (gitignored) — current phase, what's verified, what's next.
   Update it as you complete work.
+- **`docs/CODING-STANDARDS.md`** (gitignored) — how to write the code, including the
+  comment rules. **Never cite plan section numbers in source comments.**
 - `../sona_app_ui/<screen>/` — `code.html` + `screen.png` per screen. These are **visual
   references, not code to port.** Re-implement natively from the design tokens.
 - `../sona_app_ui/sona/DESIGN.md` — the YAML frontmatter is canonical for colors/type/spacing.

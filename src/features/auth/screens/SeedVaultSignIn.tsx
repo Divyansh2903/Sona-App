@@ -9,18 +9,13 @@ import { useSession, type SessionError } from '@/hooks/useSession';
 import { theme, withAlpha } from '@/theme/theme';
 
 /**
- * SeedVaultSignIn — reference `sona_app_ui/seed_vault_sign_in` (§10 screen 2).
+ * Reference: `sona_app_ui/seed_vault_sign_in`. The whole of Sona's auth surface —
+ * one wallet, over Mobile Wallet Adapter.
  *
- * This is the whole of Sona's auth surface: one wallet, over Mobile Wallet
- * Adapter. No Google, no email, no password (§6.2 #4).
- *
- * TWO CORRECTIONS to the reference:
- *  - Its "VERIFIED HUMAN" mark is gone (§8 #8). Nothing is verified at sign-in,
- *    and the green Sona Mark means "minted, owned Sona" — which no one is yet.
- *    The hero is a Seed Vault shield instead.
- *  - "Use PIN instead" is not a second auth path (§8 #3). PIN-vs-biometric is
- *    the wallet's own fallback, so it reads as an explanation, not a button
- *    that would go nowhere.
+ * Two corrections to the reference: its "VERIFIED HUMAN" mark is gone, because
+ * nothing is verified at sign-in and the Sona Mark means "minted, owned Sona" —
+ * which no one is yet. And "Use PIN instead" is copy rather than a button, since
+ * PIN-vs-biometric is the wallet's own fallback and Sona has nowhere to send it.
  */
 export function SeedVaultSignIn({ navigation }: RootScreenProps<'SeedVaultSignIn'>) {
   const insets = useSafeAreaInsets();
@@ -106,7 +101,6 @@ export function SeedVaultSignIn({ navigation }: RootScreenProps<'SeedVaultSignIn
           accessibilityHint="Opens your Solana wallet to approve Sona"
         />
 
-        {/* §8 #3: the PIN fallback belongs to the wallet, not to Sona. */}
         <Text variant="labelMd" color={theme.color.textMuted} align="center">
           Fingerprint or PIN — your wallet decides which.
         </Text>

@@ -1,9 +1,9 @@
 /**
- * Shared, presentational components (SONA_TECHNICAL_PLAN.md §5.2).
+ * Shared, presentational components.
  * Feature code imports from here; nothing in this folder may import from `features/`.
  *
  * Not yet built: CatalogPicker — it depends on the character catalog manifest and
- * is built in Phase 3 alongside `services/catalog.ts` (§6.6).
+ * is built alongside `services/catalog.ts`.
  */
 export { AuraBadge, type AuraBadgeProps } from '@/components/AuraBadge';
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from '@/components/Button';

@@ -24,12 +24,12 @@ const METRICS: Record<SonaMarkSize, MarkMetrics> = {
 };
 
 /**
- * The Sona Mark (SONA_TECHNICAL_PLAN.md §5.2, DESIGN.md "The Sona Mark").
+ * The Sona Mark.
  *
  * A concentric ring with a solid dot in #16B981, wrapped in a 10% green glow.
  * It represents a "pulse"/"soul".
  *
- * MEANING (§0 identity positioning, decision log #1): this mark means **"a minted,
+ * MEANING: this mark means **"a minted,
  * owned Sona"** — a claim verifiable on-chain — and NOT "verified human". The Genesis
  * Token check was removed from scope, so the app performs no humanity verification.
  * Never label this "verified human" in UI copy or accessibility strings.

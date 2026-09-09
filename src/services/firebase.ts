@@ -7,19 +7,16 @@ import { getStorage, type FirebaseStorage } from 'firebase/storage';
 import { env } from '@/config/env';
 
 /**
- * Firebase singletons (SONA_TECHNICAL_PLAN.md §2).
- * Firestore is an index/cache — the chain is the source of truth for ownership (§6.7).
- *
- * Every accessor is guarded so Fast Refresh does not re-initialize.
+ * Firebase singletons, guarded so Fast Refresh cannot re-initialize them.
+ * Firestore is an index/cache; the chain is the source of truth for ownership.
  */
 export const firebaseApp: FirebaseApp =
   getApps().length === 0 ? initializeApp(env.firebase) : getApp();
 
 /**
- * Anonymous auth must survive cold starts: §4 keys Firestore rules off the
- * wallet mapped to the session uid, so a uid that changes every launch would
- * orphan the mapping. `initializeAuth` throws if auth was already created
- * (Fast Refresh), hence the fallback to `getAuth`.
+ * Anonymous auth must survive cold starts — a uid that changed every launch would
+ * strand the documents it created. `initializeAuth` throws if auth already exists
+ * (Fast Refresh), hence the fallback.
  */
 function createAuth(): Auth {
   try {

@@ -11,16 +11,12 @@ import { Text } from '@/components/Text';
 import { theme, withAlpha } from '@/theme/theme';
 
 /**
- * Welcome — reference `sona_app_ui/welcome_to_sona` (§10 screen 1).
+ * Reference: `sona_app_ui/welcome_to_sona`.
  *
- * COPY CORRECTED per §8 #8 / decision log #1. The reference claims "Everyone
- * here is real", "HUMAN VERIFIED" and "verified on-chain by their Seeker
- * device". Sona performs no humanity verification, so the promise is the honest
- * economic one instead: a Sona is a paid 1/1 NFT you own. Nothing on this
- * screen may imply a verified human.
- *
- * The hero art is the catalog character canvas in its placeholder state — the
- * catalog itself lands in Phase 3 (§6.6).
+ * The reference copy claims "Everyone here is real" and "HUMAN VERIFIED". Sona
+ * performs no humanity verification, so the promise here is the economic one
+ * instead: a Sona is a paid 1/1 NFT you own. Nothing on this screen may imply a
+ * verified human.
  */
 export function Welcome({ navigation }: RootScreenProps<'Welcome'>) {
   const insets = useSafeAreaInsets();
@@ -85,14 +81,18 @@ export function Welcome({ navigation }: RootScreenProps<'Welcome'>) {
           </Text>
 
           <Text variant="bodyLg" color={theme.color.textMuted} align="center">
-            Slow social on Solana. Your Sona is a 1/1 NFT in your own wallet, not a profile
-            anyone can spin up for free.
+            Slow social on Solana. Your Sona is a 1/1 NFT in your own wallet, not a profile anyone
+            can spin up for free.
           </Text>
         </View>
 
         <View style={styles.actions}>
           {/* Onboarding progress: Welcome → sign in → choose your Sona (Phase 3). */}
-          <View style={styles.dots} accessibilityRole="progressbar" accessibilityLabel="Step 1 of 3">
+          <View
+            style={styles.dots}
+            accessibilityRole="progressbar"
+            accessibilityLabel="Step 1 of 3"
+          >
             <View style={[styles.dot, styles.dotActive]} />
             <View style={styles.dot} />
             <View style={styles.dot} />

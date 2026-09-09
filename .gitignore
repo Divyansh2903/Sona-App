@@ -43,8 +43,8 @@ yarn-error.*
 .env.*
 !.env.example
 
-# local working log (see CLAUDE.md) — not a deliverable
-progress.md
+# local working docs (progress log, coding standards) — not deliverables
+docs/
 
 # typescript / lint caches
 *.tsbuildinfo

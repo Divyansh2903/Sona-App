@@ -6,19 +6,18 @@ import { Text } from '@/components/Text';
 import { theme, withAlpha } from '@/theme/theme';
 
 export interface ChatBubbleProps {
-  /** Already-decrypted body. Ciphertext must never reach this component (§6.5). */
+  /** Already-decrypted body. Ciphertext must never reach this component. */
   text: string;
   /** True when the message was sent by the current user. */
   isSelf: boolean;
   /** Letters render with a touch more breathing room than chat messages. */
   kind?: 'message' | 'letter';
   timestamp?: string;
-  /** Attached SOL tip, if any (§6.4). */
+  /** Attached SOL tip, if any. */
   tipAmountSol?: number;
 }
 
 /**
- * ChatBubble (SONA_TECHNICAL_PLAN.md §5.2).
  *  - self:  gradient fill, white text, 20px radius with bottom-RIGHT sharpened to 4px
  *  - other: white surface, ink text, 20px radius with bottom-LEFT sharpened to 4px
  *

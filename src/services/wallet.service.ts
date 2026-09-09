@@ -15,19 +15,15 @@ import { APP_IDENTITY } from '@/config/constants';
 import { SOLANA_CHAIN, toPublicKey } from '@/services/solana.service';
 
 /**
- * Mobile Wallet Adapter access (SONA_TECHNICAL_PLAN.md §6.2).
+ * The only module that talks to a wallet.
  *
- * This module is the ONLY place that talks to a wallet. It is Android-native:
- * importing it registers a TurboModule, so it cannot run in Expo Go or a web
- * bundle — a dev build is required, and nothing here is testable off-device.
+ * Importing it registers an Android TurboModule, so it cannot run in Expo Go or a
+ * web bundle — a dev build is required and nothing here is testable off-device.
  *
- * SESSION MODEL — deliberate deviation from a literal reading of §6.2 #5:
- * MWA has no headless reauthorize. Every `transact()` foregrounds the wallet
- * app, so "silently re-authorize on launch" would bounce the user out of Sona
- * on every cold start. Instead the authorization is cached in `expo-secure-store`
- * and refreshed lazily inside `withAuthorizedWallet()` the next time a signature
- * is actually needed. The user-visible behaviour §6.2 asks for — land straight
- * in the app shell on relaunch, re-prompt when the token is stale — is preserved.
+ * Session model: MWA has no headless reauthorize. Every `transact()` foregrounds
+ * the wallet app, so re-authorizing on launch would bounce the user out of Sona on
+ * every cold start. The authorization is cached instead, and refreshed lazily in
+ * `withAuthorizedWallet()` the next time a signature is actually needed.
  */
 
 const SESSION_KEY = 'sona.wallet.session';
@@ -41,7 +37,7 @@ export type WalletErrorCode =
   | 'signature_invalid'
   | 'unknown';
 
-/** Typed wallet failure, so screens can render a specific message per cause. */
+/** Carries a `code` so screens can render per-cause copy instead of parsing messages. */
 export class WalletError extends Error {
   readonly code: WalletErrorCode;
 
@@ -54,10 +50,9 @@ export class WalletError extends Error {
 
 /** The cached MWA authorization. Small enough for SecureStore's value limit. */
 export interface WalletSession {
-  /** base58 — the app's stable user key everywhere (§4). */
+  /** base58, and the key every document in the app is stored under. */
   walletAddress: string;
   authToken: string;
-  /** Wallet-provided account label, when it offers one. */
   label: string | null;
   chain: string;
   authorizedAt: number;
@@ -67,11 +62,9 @@ export interface ProvenConnection {
   session: WalletSession;
   /** The exact bytes the wallet was asked to sign. */
   challenge: Uint8Array;
-  /** The 64-byte ed25519 signature extracted from the wallet's signed payload. */
+  /** The 64-byte ed25519 signature, extracted from the wallet's signed payload. */
   signature: Uint8Array;
 }
-
-// ─── Session storage ─────────────────────────────────────────────────────────
 
 export async function loadSession(): Promise<WalletSession | null> {
   const raw = await SecureStore.getItemAsync(SESSION_KEY);
@@ -111,15 +104,12 @@ function parseSession(value: unknown): WalletSession | null {
   };
 }
 
-// ─── Connect + prove liveness ────────────────────────────────────────────────
-
 /**
- * Authorizes with a wallet and, in the SAME wallet round-trip, has it sign a
- * challenge (§6.2 steps 1–2 — the Seed Vault moment). Doing both inside one
- * `transact` means the user approves once, not twice.
+ * Authorizes, then has the wallet sign a challenge in the same `transact` — one
+ * round-trip, so the user approves once rather than twice.
  *
- * `buildChallenge` receives the just-authorized address so the signed message
- * can name the wallet it belongs to.
+ * `buildChallenge` receives the just-authorized address so the signed message can
+ * name the wallet it belongs to.
  */
 export async function connectAndProve(
   buildChallenge: (walletAddress: string) => Uint8Array,
@@ -144,11 +134,9 @@ export async function connectAndProve(
 }
 
 /**
- * Runs `callback` against an authorized wallet, refreshing the cached token
- * first. Phase 3+ signing (mint, tips, shop) goes through here.
- *
- * Falls back to a full `authorize` when the cached token has been revoked —
- * that is the "else re-prompt" half of §6.2 #5.
+ * Runs `callback` against an authorized wallet, refreshing the cached token first
+ * and falling back to a full `authorize` when it has been revoked. All signing
+ * goes through here.
  */
 export async function withAuthorizedWallet<T>(
   callback: (wallet: Web3MobileWallet, session: WalletSession) => Promise<T>,
@@ -179,7 +167,7 @@ export async function withAuthorizedWallet<T>(
   });
 }
 
-/** Signs and submits transactions, returning base58 signatures (§6.4). */
+/** Returns base58 signatures. */
 export async function signAndSendTransactions(
   transactions: (Transaction | VersionedTransaction)[],
   options?: { minContextSlot?: number; skipPreflight?: boolean },
@@ -204,8 +192,6 @@ export async function disconnect(): Promise<void> {
     // user cancelled) must not block signing out.
   }
 }
-
-// ─── Internals ───────────────────────────────────────────────────────────────
 
 async function runTransact<T>(callback: (wallet: Web3MobileWallet) => Promise<T>): Promise<T> {
   try {
@@ -264,7 +250,10 @@ function isBase64Address(address: string, decoded: ReturnType<typeof Buffer.from
  * message with the 64-byte signature appended. Some wallets return the bare
  * signature instead, so both shapes are accepted.
  */
-function extractSignature(signedPayload: Uint8Array | undefined, challenge: Uint8Array): Uint8Array {
+function extractSignature(
+  signedPayload: Uint8Array | undefined,
+  challenge: Uint8Array,
+): Uint8Array {
   if (signedPayload === undefined) {
     throw new WalletError('signature_invalid', 'The wallet returned no signature.');
   }
@@ -300,7 +289,10 @@ function toWalletError(error: unknown): WalletError {
 
   // Cancellation arrives as a plain rejection from the native module, not as a
   // typed error, so it has to be matched on text.
-  if (/cancel/i.test(message) || code === SolanaMobileWalletAdapterErrorCode.ERROR_ASSOCIATION_CANCELLED) {
+  if (
+    /cancel/i.test(message) ||
+    code === SolanaMobileWalletAdapterErrorCode.ERROR_ASSOCIATION_CANCELLED
+  ) {
     return new WalletError('cancelled', 'Sign-in was cancelled in the wallet.', { cause: error });
   }
 

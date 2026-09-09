@@ -19,7 +19,7 @@ export interface ChipProps {
 }
 
 /**
- * Chip (SONA_TECHNICAL_PLAN.md §5.2) — selectable interest/trait pill.
+ * Selectable interest/trait pill.
  * Idle = white + border; selected = gradient or soft tint.
  */
 export function Chip({
@@ -63,7 +63,7 @@ export function Chip({
       onPress={onPress}
       disabled={disabled}
       accessibilityRole="button"
-      // Pairs the selected state with a role, never color alone (plan §3).
+      // Pairs the selected state with a role, never color alone.
       accessibilityState={{ selected, disabled }}
       accessibilityLabel={label}
       style={({ pressed }) => [

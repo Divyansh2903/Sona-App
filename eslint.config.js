@@ -16,7 +16,6 @@ module.exports = [
       react: { version: '19.2' },
     },
     rules: {
-      // Plan §3: no `any` — use `unknown` + narrowing.
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/no-unused-vars': [
         'error',

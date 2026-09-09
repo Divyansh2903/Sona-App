@@ -15,11 +15,8 @@ import {
 } from '@/theme/tokens';
 
 /**
- * Semantic theme (SONA_TECHNICAL_PLAN.md §5.1). Components consume `theme.color.*`
- * rather than raw palette entries, so a token change lands everywhere at once.
- *
- * Light-first only — Sona has no dark mode (§8.8: "dark-mode-only" contradicts the
- * concept; the app is a warm, light "digital sanctuary").
+ * Components consume `theme.color.*` rather than raw palette entries, so a token
+ * change lands everywhere at once. Light-first only — Sona has no dark mode.
  */
 export const theme = {
   color: {
@@ -58,7 +55,6 @@ export const theme = {
     errorContainer: palette.errorContainer,
     onErrorContainer: palette.onErrorContainer,
 
-    /** Never used for currency labels — Sona is SOL-only (§6.4). */
     disabled: palette.surfaceContainerHighest,
     onDisabled: palette.outline,
   },

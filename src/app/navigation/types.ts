@@ -1,14 +1,9 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 
 /**
- * Typed routes (SONA_TECHNICAL_PLAN.md §3, §6.1).
- *
- * One stack, two halves: the onboarding screens exist only while signed out,
- * the shell only while signed in — `RootNavigator` swaps the screen set rather
- * than navigating between them, so there is no back-door out of auth.
- *
- * Phase 3 inserts `ChooseYourSona` into the onboarding half for first-run, and
- * Phases 4–6 add the stack-pushed screens (ProfileDetails, ChatThread, …).
+ * One stack, two halves: onboarding exists only while signed out, the shell only
+ * while signed in. `RootNavigator` swaps the screen set rather than navigating
+ * between them, so no route can reach the shell unauthenticated.
  */
 export type RootStackParamList = {
   Welcome: undefined;

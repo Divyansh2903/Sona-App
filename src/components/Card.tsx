@@ -13,8 +13,7 @@ export interface CardProps {
 }
 
 /**
- * Card (SONA_TECHNICAL_PLAN.md §5.2) — white, 28px radius, soft plum shadow,
- * 24px content padding.
+ * White, 28px radius, soft plum shadow, 24px content padding.
  */
 export function Card({ children, onPress, padded = true, style, accessibilityLabel }: CardProps) {
   const cardStyle = [styles.card, padded && styles.padded, style];

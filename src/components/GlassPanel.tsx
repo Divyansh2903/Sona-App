@@ -13,9 +13,8 @@ export interface GlassPanelProps {
 }
 
 /**
- * GlassPanel (SONA_TECHNICAL_PLAN.md §5.2) — the app's depth primitive.
- * 62% white fill + 20px blur + 1px 20%-white border. Used for the floating nav,
- * headers, and prompt cards.
+ * The app's depth primitive: 62% white fill, 20px blur, 1px 20%-white border.
+ * Used for the floating nav, headers, and prompt cards.
  */
 export function GlassPanel({
   children,

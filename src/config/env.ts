@@ -1,15 +1,13 @@
 import Constants from 'expo-constants';
 
 /**
- * Typed, validated access to the app environment (SONA_TECHNICAL_PLAN.md §7).
- *
- * Two sources:
+ * Typed, validated access to the app environment. Two sources:
  *  - `EXPO_PUBLIC_*` — inlined by Metro at build time. These MUST be referenced as
  *    static `process.env.EXPO_PUBLIC_X` member expressions; Metro does a literal
  *    text substitution, so dynamic lookup (`process.env[key]`) yields undefined.
  *  - `extra` — everything else, forwarded by `app.config.ts`.
  *
- * Nothing here is secret; see §9.
+ * Nothing here is secret — it all ships in the APK.
  */
 
 export type SolanaCluster = 'devnet' | 'mainnet-beta';
@@ -78,7 +76,7 @@ function validate(): void {
     );
   }
 
-  // The message key must decode to exactly 32 bytes for NaCl secretbox (§6.5).
+  // NaCl secretbox needs exactly 32 bytes; fail at boot rather than mid-encrypt.
   const keyBytes = decodeBase64Length(raw.messageEncryptionKey ?? '');
   if (keyBytes !== 32) {
     throw new Error(
@@ -116,7 +114,7 @@ export const env = {
     rpcUrl: required('solanaRpcUrl'),
     cluster: required('solanaCluster') as SolanaCluster,
     treasuryWallet: required('treasuryWallet'),
-    /** Optional collection grouping for minted Sonas (§6.8). */
+    /** Optional collection grouping for minted Sonas. */
     nftCollectionMint: raw.nftCollectionMint ?? '',
   },
   catalog: {

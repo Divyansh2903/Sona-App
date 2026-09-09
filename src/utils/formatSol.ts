@@ -1,6 +1,6 @@
 import { LAMPORTS_PER_SOL } from '@solana/web3.js';
 
-/** The SOL glyph. All Sona amounts are SOL — never USD/USDC (§6.4, §8.1). */
+/** The SOL glyph. Sona never renders USD or USDC. */
 export const SOL_SYMBOL = '◎';
 
 /**
@@ -16,7 +16,7 @@ export function formatSol(amountSol: number, decimals?: number): string {
     return `${SOL_SYMBOL} ${amountSol.toFixed(decimals)}`;
   }
 
-  // Up to 4dp (the balance precision in §6.4), minimum 2, no trailing zeros beyond that.
+  // Up to 4dp, minimum 2, no trailing zeros beyond that.
   const fixed = amountSol.toFixed(4);
   const trimmed = fixed.replace(/(\.\d{2}[1-9]*?)0+$/, '$1');
   return `${SOL_SYMBOL} ${trimmed}`;

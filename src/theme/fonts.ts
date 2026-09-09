@@ -1,11 +1,8 @@
 import { useFonts } from 'expo-font';
 
 /**
- * Font loading (SONA_TECHNICAL_PLAN.md §5.1): Bricolage Grotesque 700/800 for
- * headlines, Inter 400/600 for body and labels.
- *
- * The TTFs are vendored into `assets/fonts/` from the `@expo-google-fonts/*`
- * packages so loading is deterministic and works in any client without a prebuild.
+ * TTFs are vendored into `assets/fonts/` rather than loaded from the
+ * `@expo-google-fonts/*` packages, so this works in any client without a prebuild.
  * The family keys must match `tokens.fontFamily`.
  */
 export function useAppFonts(): [loaded: boolean, error: Error | null] {

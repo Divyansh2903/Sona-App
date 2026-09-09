@@ -16,8 +16,8 @@ export interface TextProps extends RNTextProps {
  * Typography primitive. Every piece of text in Sona should go through this so the
  * DESIGN.md scale stays the single source of truth.
  *
- * Font scaling is left enabled (plan §3, accessibility) — do not set
- * `allowFontScaling={false}` without a documented reason.
+ * Font scaling stays enabled — do not set `allowFontScaling={false}` without a
+ * documented reason.
  */
 export function Text({
   variant = 'bodyMd',

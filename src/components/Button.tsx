@@ -29,7 +29,6 @@ const SIZE_STYLE: Record<ButtonSize, ViewStyle> = {
 };
 
 /**
- * Button (SONA_TECHNICAL_PLAN.md §5.2).
  *  - primary:   gradient pill, white text, coral lift shadow
  *  - secondary: transparent, 1.5px violet border
  *  - ghost:     no fill, ink text, low-priority actions

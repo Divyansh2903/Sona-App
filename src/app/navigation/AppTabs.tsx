@@ -18,15 +18,11 @@ import { theme, withAlpha } from '@/theme/theme';
 import { shortenWallet } from '@/utils/shortenSkr';
 
 /**
- * The signed-in app shell (SONA_TECHNICAL_PLAN.md §6.1).
+ * The signed-in shell.
  *
- * Tabs are local state driving the custom `FloatingTabBar` rather than a
- * navigator: §6.1 requires stack-pushed detail screens to HIDE the bar (the
- * "Semantic Shell Mandate"), which is simpler when the shell owns it.
- *
- * Discover / Threads land in Phases 4 and 5; You is filled out in Phase 6. What
- * ships here is the shell plus a real, verifiable You tab — the wallet the
- * session actually authorized and its on-chain balance.
+ * Tabs are local state driving `FloatingTabBar` rather than a tab navigator,
+ * because pushed detail screens have to hide the bar entirely — simpler when the
+ * shell owns it. Discover and Threads are placeholders for now.
  */
 export function AppTabs() {
   const [activeTab, setActiveTab] = useState<TabKey>('you');
@@ -45,7 +41,7 @@ export function AppTabs() {
           styles.content,
           {
             paddingTop: insets.top + theme.spacing.stackMd,
-            // Clear the floating pill (§5.2) plus its 24px dock offset.
+            // Clear the floating pill plus its dock offset.
             paddingBottom: insets.bottom + theme.layout.floatingNavOffset + 96,
           },
         ]}
@@ -130,8 +126,8 @@ function YouTab({ session }: { session: SonaSession }) {
           No Sona yet
         </Text>
         <Text variant="bodySm" color={theme.color.textMuted} style={styles.cardBody}>
-          Minting your 1/1 Sona is the next step. Until then your profile has no Sona Mark —
-          the mark means a minted, owned Sona and nothing else.
+          Minting your 1/1 Sona is the next step. Until then your profile has no Sona Mark — the
+          mark means a minted, owned Sona and nothing else.
         </Text>
       </Card>
 

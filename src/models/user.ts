@@ -3,15 +3,8 @@ import { serverTimestamp, Timestamp, type DocumentData, type FieldValue } from '
 import { fallbackSeekerId } from '@/utils/shortenSkr';
 
 /**
- * `users/{walletAddress}` (SONA_TECHNICAL_PLAN.md §4).
- *
- * Documents are keyed by the base58 **wallet address**, not by the anonymous
- * Firebase uid — the uid is session-only and is stored on the doc purely so the
- * Firestore rules can tell which session claimed the wallet.
- *
- * PERMANENT LIMITATION (§9): the rules cannot verify wallet ownership, so the
- * first write to `users/{wallet}` claims it. Reading code must never treat
- * `uid` as proof of anything.
+ * `users/{walletAddress}`, keyed by base58 wallet address rather than the
+ * anonymous Firebase uid, which is session-scoped and changes on reinstall.
  */
 
 export const USERS_COLLECTION = 'users';
@@ -33,14 +26,13 @@ export interface ProfilePrompt {
 
 export interface UserDoc {
   walletAddress: string;
-  /** Anonymous auth uid of the session that claimed this wallet. */
   uid: string;
-  /** Resolved Seeker ID, or the shortened-wallet fallback (§6.2). */
+  /** A resolved Seeker ID, or the shortened-wallet fallback. */
   seekerId: string;
   displayName: string;
   aura: Aura;
   intent: Intent;
-  /** `characters/{mintAddress}` of the active Sona; null until Phase 3's mint. */
+  /** `characters/{mintAddress}` of the active Sona; null until one is minted. */
   primaryCharacterId: string | null;
   bio: string;
   interests: string[];
@@ -50,7 +42,6 @@ export interface UserDoc {
   updatedAt: Date | null;
 }
 
-/** The write payload for a brand-new user, before the server stamps the times. */
 export interface NewUserPayload {
   walletAddress: string;
   uid: string;
@@ -66,10 +57,7 @@ export interface NewUserPayload {
   updatedAt: FieldValue;
 }
 
-/**
- * Defaults for a first sign-in. Friends-first: `dating` stays off until the user
- * opts in from Your Identity (§11 Phase 6).
- */
+/** Friends-first: `dating` stays off until the user opts in. */
 export function buildNewUserPayload(walletAddress: string, uid: string): NewUserPayload {
   const seekerId = fallbackSeekerId(walletAddress);
   return {
@@ -89,11 +77,8 @@ export function buildNewUserPayload(walletAddress: string, uid: string): NewUser
 }
 
 /**
- * Parses a Firestore snapshot into a `UserDoc`, tolerating partial/legacy docs.
- *
- * Firestore is untrusted input as far as the client is concerned (any signed-in
- * session can create a `users/*` doc, §9), so every field is narrowed rather
- * than cast.
+ * Any signed-in session can write a `users/*` doc, so treat the result as
+ * untrusted input: every field is narrowed rather than cast.
  */
 export function parseUserDoc(walletAddress: string, data: DocumentData): UserDoc {
   return {

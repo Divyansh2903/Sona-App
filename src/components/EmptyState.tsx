@@ -17,8 +17,7 @@ export interface EmptyStateProps {
 }
 
 /**
- * EmptyState (SONA_TECHNICAL_PLAN.md §5.2) — shared empty AND error state, so every
- * screen can satisfy the loading/empty/error requirement in §3.
+ * Shared empty AND error state, so every screen can cover both.
  */
 export function EmptyState({
   title,

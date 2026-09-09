@@ -4,10 +4,7 @@ import * as authService from '@/services/auth.service';
 import type { SonaSession } from '@/services/auth.service';
 import { WalletError, type WalletErrorCode } from '@/services/wallet.service';
 
-/**
- * Session state (SONA_TECHNICAL_PLAN.md §6.1, §6.2). `RootNavigator` gates on
- * `status`; screens read `session` for the wallet and user doc.
- */
+/** `RootNavigator` gates on `status`; screens read `session`. */
 
 export type SessionStatus =
   /** Reading the cached session at launch — show the splash/loader, not Welcome. */

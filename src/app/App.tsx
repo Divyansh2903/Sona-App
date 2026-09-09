@@ -12,11 +12,8 @@ import { useAppFonts } from '@/theme/fonts';
 import { theme } from '@/theme/theme';
 
 /**
- * Root providers (SONA_TECHNICAL_PLAN.md §3).
- *
- * `RootNavigator` gates onboarding vs. the app shell (§6.1). The Phase 1
- * component gallery still lives at `@/dev/ComponentGallery` — swap it in here
- * temporarily to eyeball components against the reference screens.
+ * Root providers. `@/dev/ComponentGallery` can be swapped in below to eyeball
+ * shared components against the reference screens.
  */
 export default function App() {
   const [fontsLoaded, fontError] = useAppFonts();
@@ -50,7 +47,7 @@ export default function App() {
 }
 
 function AppContent({ fontsLoaded, fontError }: { fontsLoaded: boolean; fontError: Error | null }) {
-  // Fonts carry the brand; block first render until they resolve (§5.1).
+  // Fonts carry the brand; block first render until they resolve.
   if (fontError !== null) {
     return <EmptyState tone="error" title="Couldn't load fonts" description={fontError.message} />;
   }

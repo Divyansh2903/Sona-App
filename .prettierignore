@@ -5,3 +5,8 @@ ios/
 dist/
 assets/
 pnpm-lock.yaml
+
+# Hand-formatted tables; prettier's normalization is pure diff noise here.
+CLAUDE.md
+AGENTS.md
+docs/

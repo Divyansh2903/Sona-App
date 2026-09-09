@@ -12,15 +12,14 @@ export interface SheetProps {
   children: React.ReactNode;
   /**
    * Blocks backdrop/back-button dismissal. Use for in-flight transactions so a
-   * stray tap can't orphan a mint the user already paid for (§6.8).
+   * stray tap can't orphan a mint the user already paid for.
    */
   dismissable?: boolean;
   style?: ViewStyle;
 }
 
 /**
- * Sheet (SONA_TECHNICAL_PLAN.md §5.2) — bottom sheet for confirm / mint / tip /
- * report actions.
+ * Bottom sheet for confirm / mint / tip / report actions.
  */
 export function Sheet({
   visible,

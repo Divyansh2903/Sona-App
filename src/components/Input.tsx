@@ -18,7 +18,6 @@ export interface InputProps extends Omit<TextInputProps, 'style'> {
 }
 
 /**
- * Input / Textarea (SONA_TECHNICAL_PLAN.md §5.2).
  * 10%-opacity fill, 16px radius; focus swaps the border to a 1.5px violet stroke.
  */
 export function Input({
@@ -73,7 +72,7 @@ export function Input({
         {trailingIcon}
       </View>
 
-      {/* Error takes precedence, and is text — never color alone (plan §3). */}
+      {/* Error takes precedence, and is text — never color alone. */}
       {hasError ? (
         <Text variant="labelSm" color={theme.color.error}>
           {error}

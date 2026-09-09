@@ -14,11 +14,8 @@ import { fontFamily } from '@/theme/tokens';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 /**
- * Auth gating (SONA_TECHNICAL_PLAN.md §6.1).
- *
- * The onboarding screens and the app shell are never mounted at the same time,
- * so there is no route that can navigate around sign-in. Phase 3 adds
- * `ChooseYourSona` to the signed-out half for first-run minting.
+ * Onboarding and the shell are never mounted at the same time, so no route can
+ * navigate around sign-in.
  */
 export function RootNavigator() {
   const status = useSession((state) => state.status);
@@ -39,7 +36,7 @@ export function RootNavigator() {
       <Stack.Navigator
         screenOptions={{
           headerShown: false,
-          // Onboarding and mint use custom headers; the shell hides the bar (§6.1).
+          // Onboarding and mint flows draw their own headers.
           contentStyle: { backgroundColor: theme.color.background },
         }}
       >
@@ -56,7 +53,7 @@ export function RootNavigator() {
   );
 }
 
-/** Sona is light-first only — there is no dark theme to switch to (§5.1). */
+/** Sona is light-first only; there is no dark theme to switch to. */
 const navigationTheme: NavigationTheme = {
   dark: false,
   colors: {

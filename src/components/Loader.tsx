@@ -12,7 +12,7 @@ export interface LoaderProps {
   fullscreen?: boolean;
 }
 
-/** Reusable loading state (plan §3: every screen implements loading/empty/error). */
+/** Shared loading state. */
 export function Loader({
   label,
   size = 'large',

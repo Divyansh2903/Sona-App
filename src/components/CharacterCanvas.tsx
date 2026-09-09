@@ -9,7 +9,7 @@ import { theme, withAlpha } from '@/theme/theme';
 export interface CharacterCanvasProps {
   /** Catalog thumbnail or the minted NFT's image. */
   imageUri?: string;
-  /** Shows the "Owned · on-chain" chip. True only once the NFT is confirmed (§6.7). */
+  /** Shows the "Owned · on-chain" chip. True only once the NFT is confirmed. */
   owned?: boolean;
   /** Character/Sona name overlaid at the bottom. */
   name?: string;
@@ -19,9 +19,8 @@ export interface CharacterCanvasProps {
 }
 
 /**
- * CharacterCanvas (SONA_TECHNICAL_PLAN.md §5.2) — a catalog character on a soft
- * pedestal, with the on-chain "owned" mark. Used in the picker, profile, and
- * identity screens. Shows a skeleton while the image loads.
+ * A catalog character on a soft pedestal with the on-chain "owned" mark. Shows a
+ * skeleton while the image loads.
  */
 export function CharacterCanvas({
   imageUri,

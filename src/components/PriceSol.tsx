@@ -18,11 +18,8 @@ export interface PriceSolProps {
 }
 
 /**
- * PriceSol (SONA_TECHNICAL_PLAN.md §5.2, §6.4, §8.1).
- *
- * Renders a SOL amount as `◎ 0.02`. This component REPLACES every `$x.xx` in the
- * UI reference. Sona never displays USD or USDC — if you are about to render a
- * currency figure, it goes through here.
+ * Renders a SOL amount as `◎ 0.02`, replacing every `$x.xx` in the UI reference.
+ * If you are about to render a currency figure, it goes through here.
  */
 export function PriceSol({
   amountSol,

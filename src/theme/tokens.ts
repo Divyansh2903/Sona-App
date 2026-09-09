@@ -1,17 +1,10 @@
 /**
- * Design tokens — ported from `sona_app_ui/sona/DESIGN.md` frontmatter.
- * DESIGN.md is the source of truth (SONA_TECHNICAL_PLAN.md §1, §5.1).
+ * Ported from the `sona_app_ui/sona/DESIGN.md` YAML frontmatter, which is the
+ * source of truth for every value here.
  *
- * ─────────────────────────────────────────────────────────────────────────────
- * DEVIATION — background color (plan §5.1 / §8.2)
- * DESIGN.md YAML sets `background`/`surface` to #fff7f9 (warm pink-white), but the
- * DESIGN.md prose ("Base Layer: #F3F0F7") and every `<screen>/code.html`
- * (`body { background: #F3F0F7 }`) use a cool lavender-gray, and the rendered
- * screen.png references visibly show the cool tone.
- *
- * RESOLUTION: use the YAML token #fff7f9, per plan §5.1, which designates the YAML
- * frontmatter as canonical. Do NOT hardcode #F3F0F7 anywhere.
- * ─────────────────────────────────────────────────────────────────────────────
+ * Background is deliberately the warm #fff7f9 from that YAML, even though the
+ * DESIGN.md prose, every `code.html`, and the rendered screenshots all show a
+ * cooler #F3F0F7. The frontmatter wins. Do not hardcode #F3F0F7 anywhere.
  */
 
 /** Verbatim from the DESIGN.md YAML `colors` block. */
@@ -65,10 +58,7 @@ export const palette = {
   surfaceVariant: '#eae0e4',
 } as const;
 
-/**
- * Derived brand tokens (plan §5.1). Present in the reference HTML/prose but absent
- * from the YAML, so they are defined here rather than invented per-screen.
- */
+/** Present in the reference HTML but absent from the YAML, so defined once here. */
 export const brand = {
   /** Plum → coral, 135°. Primary buttons, self chat bubble, active nav dot. */
   primaryGradient: ['#5B2A52', '#FF5C8A'] as const,
@@ -91,8 +81,8 @@ export const glass = {
 } as const;
 
 /**
- * Radii. The YAML `rounded` scale (in rem) does not reach the radii the reference
- * actually uses, so the component-level values from §5.1 are carried alongside it.
+ * The YAML `rounded` scale does not reach the radii the reference actually uses,
+ * so the component-level values are carried alongside it.
  */
 export const radius = {
   // YAML `rounded`, converted rem -> px at 16px root.
@@ -102,7 +92,7 @@ export const radius = {
   lg: 16,
   xl: 24,
   full: 9999,
-  // Derived, from the reference screens (§5.1).
+  // Derived from the reference screens.
   card: 28,
   bubble: 20,
   /** The "sharpened" corner on a chat bubble's tail side. */
@@ -129,7 +119,7 @@ export const CARD_PADDING = 24;
 /** Chat stays intimate on wide displays (DESIGN.md "Reflow"). */
 export const SOCIAL_TRACK_MAX_WIDTH = 600;
 
-/** Minimum touch target (plan §3, accessibility). */
+/** Minimum accessible touch target. */
 export const MIN_TOUCH_TARGET = 48;
 
 /** Floating nav sits 24px off the bottom (DESIGN.md "Floating Pill Navigation"). */
