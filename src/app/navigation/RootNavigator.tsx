@@ -7,6 +7,7 @@ import type { RootStackParamList } from '@/app/navigation/types';
 import { Loader } from '@/components/Loader';
 import { SeedVaultSignIn } from '@/features/auth/screens/SeedVaultSignIn';
 import { Welcome } from '@/features/auth/screens/Welcome';
+import { ChooseYourSona } from '@/features/mint/screens/ChooseYourSona';
 import { useSession } from '@/hooks/useSession';
 import { theme } from '@/theme/theme';
 import { fontFamily } from '@/theme/tokens';
@@ -20,6 +21,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 export function RootNavigator() {
   const status = useSession((state) => state.status);
   const restore = useSession((state) => state.restore);
+  const primaryCharacterId = useSession((state) => state.session?.user.primaryCharacterId ?? null);
 
   useEffect(() => {
     void restore();
@@ -30,6 +32,9 @@ export function RootNavigator() {
   }
 
   const signedIn = status === 'signed_in';
+  // A signed-in wallet without a minted Sona has no identity to show in the shell,
+  // so minting is the only route forward rather than a screen it can skip.
+  const hasSona = primaryCharacterId !== null && primaryCharacterId !== '';
 
   return (
     <NavigationContainer theme={navigationTheme}>
@@ -41,7 +46,11 @@ export function RootNavigator() {
         }}
       >
         {signedIn ? (
-          <Stack.Screen name="AppShell" component={AppTabs} />
+          hasSona ? (
+            <Stack.Screen name="AppShell" component={AppTabs} />
+          ) : (
+            <Stack.Screen name="ChooseYourSona" component={ChooseYourSona} />
+          )
         ) : (
           <>
             <Stack.Screen name="Welcome" component={Welcome} />

@@ -8,6 +8,8 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 export type RootStackParamList = {
   Welcome: undefined;
   SeedVaultSignIn: undefined;
+  /** Signed in, but no Sona minted yet — the shell stays out of reach until there is one. */
+  ChooseYourSona: undefined;
   AppShell: undefined;
 };
 

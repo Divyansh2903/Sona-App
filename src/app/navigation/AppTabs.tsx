@@ -76,6 +76,8 @@ export function AppTabs() {
 function YouTab({ session }: { session: SonaSession }) {
   const signOut = useSession((state) => state.signOut);
   const walletAddress = session.wallet.walletAddress;
+  const mintAddress =
+    session.user.primaryCharacterId === '' ? null : session.user.primaryCharacterId;
 
   const balance = useQuery({
     queryKey: ['balance', walletAddress],
@@ -121,14 +123,32 @@ function YouTab({ session }: { session: SonaSession }) {
         </View>
       </Card>
 
+      {/* The full identity surface is still to come; this states what the wallet
+          actually holds rather than assuming it holds nothing. */}
       <Card>
-        <Text variant="labelMd" color={theme.color.primary}>
-          No Sona yet
-        </Text>
-        <Text variant="bodySm" color={theme.color.textMuted} style={styles.cardBody}>
-          Minting your 1/1 Sona is the next step. Until then your profile has no Sona Mark — the
-          mark means a minted, owned Sona and nothing else.
-        </Text>
+        {mintAddress === null ? (
+          <>
+            <Text variant="labelMd" color={theme.color.primary}>
+              No Sona yet
+            </Text>
+            <Text variant="bodySm" color={theme.color.textMuted} style={styles.cardBody}>
+              Minting your 1/1 Sona is the next step. Until then your profile has no Sona Mark —
+              the mark means a minted, owned Sona and nothing else.
+            </Text>
+          </>
+        ) : (
+          <>
+            <Text variant="labelMd" color={theme.color.primary}>
+              Your Sona
+            </Text>
+            <Text variant="bodySm" color={theme.color.textMuted} style={styles.cardBody}>
+              Minted and owned by this wallet. The Sona Mark means exactly that, and nothing more.
+            </Text>
+            <Text variant="labelSm" color={theme.color.textMuted}>
+              {shortenWallet(mintAddress)}
+            </Text>
+          </>
+        )}
       </Card>
 
       <Button label="Sign out" onPress={() => void signOut()} variant="secondary" size="md" />

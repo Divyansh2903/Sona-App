@@ -1,15 +1,8 @@
 /**
- * Polyfills MUST be imported before anything that touches @solana/web3.js.
- * - react-native-get-random-values: provides crypto.getRandomValues (Keypair.generate,
- *   tweetnacl nonces).
- * - buffer: web3.js and SPL Token assume a global Buffer, which RN does not ship.
+ * Polyfills are imported first and as a side-effect module, so they are evaluated
+ * before the app tree. Do not inline them here — see the note in `src/polyfills`.
  */
-import 'react-native-get-random-values';
-import { Buffer } from 'buffer';
-
-if (typeof globalThis.Buffer === 'undefined') {
-  globalThis.Buffer = Buffer;
-}
+import '@/polyfills';
 
 import { registerRootComponent } from 'expo';
 

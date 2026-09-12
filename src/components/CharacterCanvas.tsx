@@ -14,6 +14,11 @@ export interface CharacterCanvasProps {
   /** Character/Sona name overlaid at the bottom. */
   name?: string;
   seekerId?: string;
+  /**
+   * Fixed height. Omit for a square canvas, which is the default and what catalog
+   * art is authored for — a square image in a square frame fills it exactly, so
+   * there is no crop and no letterboxing against the background.
+   */
   height?: number;
   style?: ViewStyle;
 }
@@ -27,14 +32,14 @@ export function CharacterCanvas({
   owned = false,
   name,
   seekerId,
-  height = 340,
+  height,
   style,
 }: CharacterCanvasProps) {
   const [loading, setLoading] = useState(imageUri !== undefined);
   const [failed, setFailed] = useState(false);
 
   return (
-    <View style={[styles.container, { height }, style]}>
+    <View style={[styles.container, height === undefined ? styles.square : { height }, style]}>
       {/* Soft pedestal glow behind the character. */}
       <LinearGradient
         colors={[withAlpha(theme.color.primary, 0.06), withAlpha(theme.color.accent, 0.1)]}
@@ -47,6 +52,9 @@ export function CharacterCanvas({
         <Image
           source={{ uri: imageUri }}
           style={StyleSheet.absoluteFill}
+          // Square art in a square frame, so this fills edge to edge without
+          // cropping. `cover` rather than `contain` so a render that is a pixel
+          // off square still fills rather than showing a seam.
           resizeMode="cover"
           accessibilityLabel={name !== undefined ? `${name}'s Sona character` : 'Sona character'}
           onLoadEnd={() => setLoading(false)}
@@ -107,6 +115,9 @@ export function CharacterCanvas({
 }
 
 const styles = StyleSheet.create({
+  square: {
+    aspectRatio: 1,
+  },
   container: {
     borderRadius: theme.radius.card,
     overflow: 'hidden',

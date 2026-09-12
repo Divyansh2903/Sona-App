@@ -177,7 +177,7 @@ export function ComponentGallery() {
         </Section>
 
         <Section title="CharacterCanvas">
-          <CharacterCanvas name="Alex" seekerId="@alex.skr" owned height={280} />
+          <CharacterCanvas name="Alex" seekerId="@alex.skr" owned />
           <Text variant="labelSm" color={theme.color.textMuted}>
             Placeholder state shown — catalog artwork lands in Phase 3.
           </Text>

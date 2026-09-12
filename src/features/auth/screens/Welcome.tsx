@@ -57,7 +57,7 @@ export function Welcome({ navigation }: RootScreenProps<'Welcome'>) {
         </View>
 
         <View style={styles.hero}>
-          <CharacterCanvas height={320} />
+          <CharacterCanvas />
           {/* Floating depth chip, as in the reference — with honest copy. */}
           <GlassPanel radius={theme.radius.lg} style={styles.heroChip}>
             <View style={styles.heroChipInner}>

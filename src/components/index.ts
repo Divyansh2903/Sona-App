@@ -1,13 +1,11 @@
 /**
  * Shared, presentational components.
  * Feature code imports from here; nothing in this folder may import from `features/`.
- *
- * Not yet built: CatalogPicker — it depends on the character catalog manifest and
- * is built alongside `services/catalog.ts`.
  */
 export { AuraBadge, type AuraBadgeProps } from '@/components/AuraBadge';
 export { Button, type ButtonProps, type ButtonSize, type ButtonVariant } from '@/components/Button';
 export { Card, type CardProps } from '@/components/Card';
+export { CatalogPicker, type CatalogPickerProps } from '@/components/CatalogPicker';
 export { CharacterCanvas, type CharacterCanvasProps } from '@/components/CharacterCanvas';
 export { ChatBubble, type ChatBubbleProps } from '@/components/ChatBubble';
 export { Chip, type ChipProps } from '@/components/Chip';

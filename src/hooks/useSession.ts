@@ -28,6 +28,8 @@ interface SessionState {
   restore: () => Promise<void>;
   signIn: () => Promise<void>;
   signOut: () => Promise<void>;
+  /** Patches the cached user after a mint, so the shell unlocks without a refetch. */
+  setPrimaryCharacter: (mintAddress: string) => void;
   clearError: () => void;
 }
 
@@ -71,6 +73,12 @@ export const useSession = create<SessionState>()((set, get) => ({
       // Whatever the wallet says, the local session is gone.
       set({ status: 'signed_out', session: null, error: null });
     }
+  },
+
+  setPrimaryCharacter: (mintAddress) => {
+    const current = get().session;
+    if (current === null) return;
+    set({ session: { ...current, user: { ...current.user, primaryCharacterId: mintAddress } } });
   },
 
   clearError: () => set({ error: null }),

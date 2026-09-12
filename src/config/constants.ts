@@ -47,8 +47,6 @@ export const MEMO_PREFIX = 'sona:';
 export const MINT_WATCHDOG_MS = 90_000;
 
 export const FEATURE_FLAGS = {
-  /** Opt-in Dating mode alongside the friends-first default. */
-  datingMode: true,
   /** A catalog filter, never a generator — no AI ships in the app. */
   catalogVibeFilter: true,
 } as const;

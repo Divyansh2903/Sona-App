@@ -82,12 +82,13 @@ limitation (plan §9), not an oversight.
 | Trap | Resolution |
 |---|---|
 | `@metaplex-foundation/mpl-token-metadata` | **Pinned to `^2.13.0`.** 3.x is Umi-based and cannot emit web3.js instructions, so it cannot build the §6.8 mint tx. Never upgrade. |
-| `@solana/web3.js` crashes at runtime | Needs `react-native-get-random-values` + `buffer`, imported at the **top of `index.ts`** before anything else. |
+| `@solana/web3.js` crashes at runtime | Needs `react-native-get-random-values` + `buffer`. Both live in **`src/polyfills.ts`**, imported first by `index.ts`. See the `Buffer` row below for why they cannot be inlined. |
 | `StyleSheet.absoluteFillObject` | Removed from RN 0.86 types. Use `StyleSheet.absoluteFill`. |
 | `android.edgeToEdgeEnabled` in app.config | Not a valid SDK 57 key; edge-to-edge is default-on. |
 | ESLint crashes in `eslint-plugin-react` | ESLint 10 removed an API it uses for version detection. `settings.react.version` is pinned in `eslint.config.js` to bypass it. |
 | `getReactNativePersistence` missing from types | `firebase/auth` has no `react-native` export condition. Typed augmentation lives in `src/types/firebase-auth-rn.d.ts`. |
 | `StatusBar backgroundColor` | Gone in SDK 57 edge-to-edge; only the icon tint applies. |
+| `ReferenceError: Property 'Buffer' doesn't exist` at startup | Import declarations are **hoisted above statements**, so a `globalThis.Buffer = Buffer` assignment sitting between imports in `index.ts` ran *after* the whole app tree had been evaluated. It only ever worked by luck, until a module constructed a `PublicKey` at module scope. The assignment now lives in **`src/polyfills.ts`**, imported first as a side-effect module so it is part of the import graph. Never inline polyfills into `index.ts` again. |
 
 ## Verification expectations
 

@@ -57,3 +57,5 @@ docs/
 # generated native folders
 /ios
 /android
+
+.claude/
